@@ -7,3 +7,7 @@ HW3: An in-memory inverted index produced by hw2 and writes it out to disk in an
 HW4: A simple Web server that hosts a website for the search engine in C++.
 
 TorRouter implementation without Encryption in Java
+
+Wallpaper Crawler:
+Requres your own reddit app and praw.ini file
+Needs *[`PRAW`](https://pypi.python.org/pypi/praw)* and *[`Pillow`](https://pypi.python.org/pypi/Pillow/2.1.0)*

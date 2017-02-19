@@ -1,8 +1,8 @@
 import sys
-import json
 import mimetypes
-import urllib.request
+import urllib
 import praw
+from PIL import ImageFile
 from settings import Settings
 
 
@@ -12,26 +12,33 @@ class Crawler:
         self.config = Settings()
 
     def get_resolution(self, url):
-        if "imgur" in url:
-            imageid = url.split('/')[-1].split('.')[0]
-            url = "http://api.imgur.com/3/image/" + imageid
-            print(url)
-            request = urllib.request.Request(url)
-            open_request = urllib.request.urlopen(request)
-            response = open_request.read()
-            img_info = json.loads(response)
-            width = img_info['data']['width']
-            height = img_info['data']['height']
-            return width, height
-        else:
-            return (10000, 10000)
+        file = urllib.request.urlopen(url)
+        size = file.headers.get("content-length")
+        if size:
+            size = int(size)
+        p = ImageFile.Parser()
+        while 1:
+            data = file.read(1024)
+            if not data:
+                break
+            p.feed(data)
+            if p.image:
+                file.close()
+                return p.image.size
+                break
+        file.close()
+        return None
 
     def download(self, url):
         mimetype, encoding = mimetypes.guess_type(url)
         filename = url.split('/')[-1]
         if mimetype and mimetype.startswith('image'):
-            #urllib.request.urlretrieve(url, self.config.path + "/" + filename)
-            return "Downloading " + filename
+            res = self.get_resolution(url)
+            if self.config.res[0] < res[0] and self.config.res[1] < res[1]:
+                urllib.request.urlretrieve(url, self.config.path + "/" + filename)
+                return "Downloading " + filename
+            else:
+                return -1
         else:
             return -1
 
@@ -41,7 +48,7 @@ class Crawler:
             subreddit = self.reddit.subreddit(subreddit)
             i = 0
             limit = self.config.num_posts
-            for submission in subreddit.hot(limit=None):
+            for submission in subreddit.hot(limit=100):
                 i += 1
                 if submission.score > self.config.min_score:
                     if self.config.title in submission.title:

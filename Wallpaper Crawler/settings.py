@@ -27,9 +27,9 @@ class Settings:
         return self._res
 
     @res.setter
-    def res(self, value, value2):
-        self._res[0] = value
-        self._res[1] = value2
+    def res(self, value):
+        splitter = value.split(',')
+        self._res = [int(x.strip()) for x in splitter]
 
     def load_defaults(self):
         if self.config.get('Defaults', 'subreddits'):
@@ -40,6 +40,10 @@ class Settings:
             self.min_score = self.config.getint('Defaults', 'min_score')
         if self.config.get('Defaults', 'path'):
             self.path = self.config.get('Defaults', 'path')
+        if self.config.get('Defaults', 'title'):
+            self.title = self.config.get('Defaults', 'title')
+        if self.config.get('Defaults', 'resolution'):
+            self.resolution = self.config.get('Defaults', 'resolution')
 
     def get_config(self):
         if self.config.get('UserSettings', 'subreddits'):
@@ -50,12 +54,15 @@ class Settings:
             self.min_score = self.config.getint('UserSettings', 'min_score')
         if self.config.get('UserSettings', 'path'):
             self.path = self.config.get('UserSettings', 'path')
+        if self.config.get('UserSettings', 'title'):
+            self.title = self.config.get('UserSettings', 'title')
 
     def save_config(self):
         self.config.set('UserSettings', 'subreddits', ', '.join(self.subreddits))
         self.config.set('UserSettings', 'num_posts', str(self.num_posts))
         self.config.set('UserSettings', 'min_score', str(self.min_score))
         self.config.set('UserSettings', 'path', self.path)
-        cfgfile = open("config.ini",'w')
+        self.config.set('UserSettings', 'title', self.title)
+        cfgfile = open("config.ini", 'w')
         self.config.write(cfgfile)
         cfgfile.close()
