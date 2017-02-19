@@ -31,7 +31,7 @@ class SettingsBox(QFrame):
         n_posts = QLabel('Number of Posts')
         min_score = QLabel('Minimum Score')
         folder = QLabel('Folder')
-        resolution = QLabel('Resolution')
+        resolution = QLabel('Minimum Resolution')
         width = QLabel('Width')
         height = QLabel('Height')
 
