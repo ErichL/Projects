@@ -1,32 +1,30 @@
 import sys
-from PyQt5.QtWidgets import (QMainWindow, QFrame, QDesktopWidget, QApplication,
-                             QWidget, QLabel, QLineEdit,
-                             QGridLayout, QAction, QFileDialog, QPushButton)
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal
+from PyQt5.QtWidgets import (QMainWindow, QFrame, QApplication, QLabel,
+                             QLineEdit, QGridLayout, QFileDialog, QPushButton)
 from crawler import Crawler
+
 
 class WallpaperCrawler(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
-        
-    def initUI(self):    
+
+    def initUI(self):
         self.settings = SettingsBox(self)
         self.setCentralWidget(self.settings)
-
         self.statusbar = self.statusBar()
-        
-        self.resize(400, 100)
-        self.setWindowTitle('Wallpaper Crawler')        
+        self.resize(600, 100)
+        self.setWindowTitle('Wallpaper Crawler')
         self.show()
-        
+
+
 class SettingsBox(QFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.crawler = Crawler()
         self.initUI()
-        self.l_default()
-        
+        self.load()
+
     def initUI(self):
         subreddits = QLabel('Subreddits')
         n_posts = QLabel('Number of Posts')
@@ -37,19 +35,19 @@ class SettingsBox(QFrame):
         self.postsEdit = QLineEdit()
         self.scoreEdit = QLineEdit()
         self.folderEdit = QLineEdit()
-        
+
         folder_btn = QPushButton("Browse...", self)
         folder_btn.clicked.connect(self.show_dialog)
 
         defaults_btn = QPushButton("Load Defaults", self)
-        defaults_btn.clicked.connect(self.l_default) 
+        defaults_btn.clicked.connect(self.l_default)
 
         save_btn = QPushButton("Save", self)
         save_btn.clicked.connect(self.save_settings)
 
         run_btn = QPushButton("Run", self)
         run_btn.clicked.connect(self.run)
-        
+
         grid = QGridLayout()
         grid.setSpacing(10)
 
@@ -69,32 +67,39 @@ class SettingsBox(QFrame):
         grid.addWidget(defaults_btn, 5, 0, 1, 1)
         grid.addWidget(save_btn, 5, 1, 1, 1)
         grid.addWidget(run_btn, 5, 4, 1, 1)
-        
+
         self.setLayout(grid)
 
     def show_dialog(self):
         directory = QFileDialog.getExistingDirectory(self, "Select Directory")
         self.folderEdit.setText(str(directory))
 
-    def save_settings(self):
+    def set_settings(self):
         self.crawler.config.subreddits = self.subredditsEdit.text()
         self.crawler.config.num_posts = int(self.postsEdit.text())
         self.crawler.config.min_score = int(self.scoreEdit.text())
-        self.crawler.config.path = self.folderEdit.text() 
+        self.crawler.config.path = self.folderEdit.text()
+
+    def save_settings(self):
+        self.set_settings()
+        self.crawler.config.save_config()
 
     def l_default(self):
         self.crawler.config.load_defaults()
+        self.load()
+
+    def load(self):
         self.subredditsEdit.setText(', '.join(self.crawler.config.subreddits))
         self.postsEdit.setText(str(self.crawler.config.num_posts))
         self.scoreEdit.setText(str(self.crawler.config.min_score))
         self.folderEdit.setText(str(self.crawler.config.path))
 
     def run(self):
-        self.save_settings()
+        self.set_settings()
         self.crawler.crawl()
-        
-    
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     wc = WallpaperCrawler()
-    sys.exit(app.exec_()) 
+    sys.exit(app.exec_())

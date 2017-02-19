@@ -1,5 +1,6 @@
 import configparser
 
+
 class Settings:
     def __init__(self):
         self._subreddits = ["earthporn", "pics"]
@@ -49,3 +50,12 @@ class Settings:
             self.min_score = self.config.getint('UserSettings', 'min_score')
         if self.config.get('UserSettings', 'path'):
             self.path = self.config.get('UserSettings', 'path')
+
+    def save_config(self):
+        self.config.set('UserSettings', 'subreddits', ', '.join(self.subreddits))
+        self.config.set('UserSettings', 'num_posts', str(self.num_posts))
+        self.config.set('UserSettings', 'min_score', str(self.min_score))
+        self.config.set('UserSettings', 'path', self.path)
+        cfgfile = open("config.ini",'w')
+        self.config.write(cfgfile)
+        cfgfile.close()

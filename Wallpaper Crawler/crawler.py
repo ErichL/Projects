@@ -1,5 +1,10 @@
-import os, sys, json, mimetypes, urllib.request, praw
+import sys
+import json
+import mimetypes
+import urllib.request
+import praw
 from settings import Settings
+
 
 class Crawler:
     def __init__(self):
@@ -22,10 +27,10 @@ class Crawler:
             return (10000, 10000)
 
     def download(self, url):
-        mimetype,encoding = mimetypes.guess_type(url)
+        mimetype, encoding = mimetypes.guess_type(url)
         filename = url.split('/')[-1]
         if mimetype and mimetype.startswith('image'):
-            urllib.request.urlretrieve(url, self.config.path + "/" + filename)
+            #urllib.request.urlretrieve(url, self.config.path + "/" + filename)
             return "Downloading " + filename
         else:
             return -1
@@ -40,14 +45,13 @@ class Crawler:
                 i += 1
                 if submission.score > self.config.min_score:
                     if self.config.title in submission.title:
-                        non_bmp_map = dict.fromkeys(range(0x10000,
-                                        sys.maxunicode + 1), 0xfffd)
+                        non_bmp_map = dict.fromkeys(range(0x10000, sys.maxunicode + 1), 0xfffd)
                         print("Title: ", submission.title.translate(non_bmp_map))
                         print("Score: ", submission.score)
-                        print("URL: " ,submission.url)
+                        print("URL: ", submission.url)
                         dl_info = self.download(submission.url)
                         print(dl_info)
-                        print("------------------------------------------------------")
+                        print("--------------------------------")
                         if dl_info == -1:
                             limit += 1
                         if i == limit:
