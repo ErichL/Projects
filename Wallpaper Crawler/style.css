@@ -1,0 +1,7 @@
+QFrame, statusBar {
+	background: white;
+}
+
+QLabel {
+	qproperty-alignment: AlignRight;
+}

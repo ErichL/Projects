@@ -22,6 +22,7 @@ class SettingsBox(QFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.crawler = Crawler()
+        self.load_stylesheet()
         self.initUI()
         self.load()
 
@@ -42,6 +43,9 @@ class SettingsBox(QFrame):
         self.folderEdit = QLineEdit()
         self.widthEdit = QLineEdit()
         self.heightEdit = QLineEdit()
+
+        self.widthEdit.setPlaceholderText("Width")
+        self.heightEdit.setPlaceholderText("Height")
 
         folder_btn = QPushButton("Browse...", self)
         folder_btn.clicked.connect(self.show_dialog)
@@ -75,16 +79,18 @@ class SettingsBox(QFrame):
         grid.addWidget(folder_btn, 5, 4, 1, 1)
 
         grid.addWidget(resolution, 6, 0)
-        grid.addWidget(width, 6, 1)
-        grid.addWidget(self.widthEdit, 6, 2)
-        grid.addWidget(height, 6, 3)
-        grid.addWidget(self.heightEdit, 6, 4)
+        grid.addWidget(self.widthEdit, 6, 1)
+        grid.addWidget(self.heightEdit, 6, 2)
 
         grid.addWidget(defaults_btn, 7, 0)
         grid.addWidget(save_btn, 7, 1)
         grid.addWidget(run_btn, 7, 4)
 
         self.setLayout(grid)
+
+    def load_stylesheet(self):
+        with open('style.css', 'r') as f:
+            self.setStyleSheet(f.read())
 
     def show_dialog(self):
         directory = QFileDialog.getExistingDirectory(self, "Select Directory")
